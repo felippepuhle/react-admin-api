@@ -11,6 +11,8 @@ import br.com.felippepuhle.vo.LoginResponseVO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,9 +34,12 @@ public class LoginController {
             return notFound().build();
         }
 
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("user", user);
+
         return ok(new LoginResponseVO(
                 Jwts.builder()
-                .setSubject(user.getLogin())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, JWTConfig.JWT_KEY)
                 .compact()
