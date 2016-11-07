@@ -1,6 +1,6 @@
 package br.com.felippepuhle.vo;
 
-public class LoginAttemptVO {
+public class LoginVO {
 
     private String login;
     private String password;
