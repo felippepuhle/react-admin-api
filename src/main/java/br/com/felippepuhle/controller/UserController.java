@@ -22,9 +22,9 @@ public class UserController {
     private UserRepository userRepository;
 
     @RequestMapping(path = "/admin/login", method = RequestMethod.POST)
-    public ResponseEntity<?> login(@RequestBody final LoginVO login) {
-        User user = userRepository.findByLoginAndPassword(login.getLogin(), login.getPassword());
-        if (user == null) {
+    public ResponseEntity<?> login(@RequestBody final LoginVO loginVO) {
+        User user = userRepository.findByLogin(loginVO.getLogin());
+        if (user == null || !user.authenticate(loginVO.getPassword())) {
             return notFound().build();
         }
 
@@ -32,13 +32,13 @@ public class UserController {
     }
 
     @RequestMapping(path = "/admin/profile", method = RequestMethod.POST)
-    public ResponseEntity<?> profile(@RequestBody final ProfileVO profile) {
-        User user = userRepository.findOne(profile.getId());
+    public ResponseEntity<?> profile(@RequestBody final ProfileVO profileVO) {
+        User user = userRepository.findOne(profileVO.getId());
         if (user == null) {
             return notFound().build();
         }
 
-        profile.toModel(user);
+        profileVO.toModel(user);
 
         userRepository.save(user);
 
