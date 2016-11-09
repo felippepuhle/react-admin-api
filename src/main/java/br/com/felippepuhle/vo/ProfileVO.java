@@ -39,7 +39,7 @@ public class ProfileVO {
         user.setEmail(email);
         user.setLogin(login);
 
-        if (password.length() > 0) {
+        if (password != null && password.length() > 0) {
             user.setPassword(password);
         }
 

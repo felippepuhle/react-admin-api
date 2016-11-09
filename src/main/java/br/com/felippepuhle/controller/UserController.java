@@ -10,17 +10,13 @@ import br.com.felippepuhle.vo.ProfileVO;
 import br.com.felippepuhle.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import static org.springframework.http.ResponseEntity.notFound;
-import static org.springframework.http.ResponseEntity.ok;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-public class AdminController {
+public class UserController {
 
     @Autowired
     private UserRepository userRepository;
