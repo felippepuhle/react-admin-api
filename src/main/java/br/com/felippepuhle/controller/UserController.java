@@ -5,10 +5,13 @@ import static org.springframework.http.ResponseEntity.ok;
 
 import br.com.felippepuhle.model.User;
 import br.com.felippepuhle.repository.UserRepository;
+import br.com.felippepuhle.util.datatable.DataTableRequest;
 import br.com.felippepuhle.vo.LoginVO;
 import br.com.felippepuhle.vo.ProfileVO;
 import br.com.felippepuhle.vo.TokenVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,4 +48,8 @@ public class UserController {
         return ok(new TokenVO(user));
     }
 
+    @RequestMapping(path = "/admin/users", method = RequestMethod.GET)
+    public ResponseEntity<?> list(Pageable pageable, DataTableRequest dataTableRequest) {
+        return ok(userRepository.findAll(pageable, dataTableRequest));
+    }
 }
