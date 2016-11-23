@@ -1,12 +1,18 @@
 package br.com.felippepuhle.util.datatable;
 
-import java.util.Map;
+import java.util.List;
 
 public class DataTableRequest {
 
-    private Map<String, Object> search;
+    private List<DataTableColumn> headers;
 
-    public Map getSearch() {
+    private String search;
+
+    public List<DataTableColumn> getHeaders() {
+        return headers;
+    }
+
+    public String getSearch() {
         return search;
     }
 
