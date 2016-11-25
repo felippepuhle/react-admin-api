@@ -2,7 +2,9 @@ package br.com.felippepuhle.util.datatable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -38,28 +40,54 @@ public class DataTableRepositoryImpl<T extends Object, ID extends Serializable> 
     }
 
     private List<T> getResults(Pageable pageable, DataTableRequest request) {
-        Criteria criteria = entityManager.unwrap(Session.class).createCriteria(beanClass);
-
-        criteria.setFirstResult(pageable.getOffset());
-        criteria.setMaxResults(pageable.getPageSize());
-
-        if (request.getSearch() != null) {
-            criteria.add(Restrictions.or(getFilters(request).toArray(new Criterion[]{})));
-        }
-
-        return criteria.list();
+        return this.createCriteria(request)
+                .setFirstResult(pageable.getOffset())
+                .setMaxResults(pageable.getPageSize())
+                .list();
     }
 
     private Long getCount(DataTableRequest request) {
-        Criteria criteria = entityManager.unwrap(Session.class).createCriteria(beanClass);
+        return (Long) this.createCriteria(request)
+                .setProjection(Projections.rowCount())
+                .uniqueResult();
+    }
 
-        criteria.setProjection(Projections.rowCount());
+    private Criteria createCriteria(DataTableRequest request) {
+        Criteria criteria = entityManager
+                .unwrap(Session.class)
+                .createCriteria(this.beanClass, "this");
+
+        this.getJoins(request)
+                .forEach((table1, table2) -> {
+                    criteria.createAlias(table1 + "." + table2, table2);
+                });
 
         if (request.getSearch() != null) {
-            criteria.add(Restrictions.or(getFilters(request).toArray(new Criterion[]{})));
+            criteria.add(
+                    Restrictions.or(
+                            this.getFilters(request).toArray(new Criterion[]{})
+                    )
+            );
         }
 
-        return (Long) criteria.uniqueResult();
+        return criteria;
+    }
+
+    private Map<String, String> getJoins(DataTableRequest request) {
+        Map<String, String> joins = new HashMap<>();
+
+        request.getHeaders()
+                .stream()
+                .filter((column) -> {
+                    return column.isValid();
+                })
+                .forEach((column) -> {
+                    column.getJoins().forEach((table1, table2) -> {
+                        joins.merge(table1, table2, String::concat);
+                    });
+                });
+
+        return joins;
     }
 
     private List<Criterion> getFilters(DataTableRequest request) {
@@ -68,13 +96,10 @@ public class DataTableRepositoryImpl<T extends Object, ID extends Serializable> 
         request.getHeaders()
                 .stream()
                 .filter((column) -> {
-                    Boolean isRealColumn = column.getProperty().length() > 0;
-                    Boolean isSearchable = column.getSearchable();
-
-                    return isRealColumn && isSearchable;
+                    return column.isValid() && column.isSearchable();
                 })
                 .forEach((column) -> {
-                    list.add(Restrictions.ilike(column.getProperty(), "%" + request.getSearch() + "%"));
+                    list.add(Restrictions.ilike(column.getPath(), "%" + request.getSearch() + "%"));
                 });
 
         return list;
