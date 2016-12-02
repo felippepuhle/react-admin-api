@@ -36,4 +36,12 @@ public class UserGroup {
         return level;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLevel(UserGroupLevel level) {
+        this.level = level;
+    }
+
 }
