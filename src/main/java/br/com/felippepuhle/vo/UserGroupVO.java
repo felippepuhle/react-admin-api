@@ -9,6 +9,16 @@ public class UserGroupVO {
     private String name;
     private String level;
 
+    public UserGroupVO() {
+
+    }
+
+    public UserGroupVO(UserGroup userGroup) {
+        this.id = userGroup.getId();
+        this.name = userGroup.getName();
+        this.level = userGroup.getLevel().toString();
+    }
+
     public Long getId() {
         return id;
     }
@@ -28,7 +38,7 @@ public class UserGroupVO {
     public UserGroup toModel(UserGroup userGroup) {
         userGroup.setName(name);
         userGroup.setLevel(UserGroupLevel.valueOf(level));
-        
+
         return userGroup;
     }
 

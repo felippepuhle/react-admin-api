@@ -26,13 +26,22 @@ public class UserGroupController {
         return ok(userGroupRepository.findOne(id));
     }
 
+    @RequestMapping(path = "/admin/groups/create", method = RequestMethod.POST)
+    public ResponseEntity<?> create(@RequestBody final UserGroupVO userGroupVO) {
+        UserGroup userGroup = userGroupVO.toModel();
+
+        userGroupRepository.save(userGroup);
+
+        return ok(new UserGroupVO(userGroup));
+    }
+
     @RequestMapping(path = "/admin/groups", method = RequestMethod.POST)
     public ResponseEntity<?> list(Pageable pageable, @RequestBody DataTableRequest dataTableRequest) {
         return ok(userGroupRepository.findAll(pageable, dataTableRequest));
     }
 
     @RequestMapping(path = "/admin/groups/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> profile(@RequestBody final UserGroupVO userGroupVO) throws Exception {
+    public ResponseEntity<?> update(@RequestBody final UserGroupVO userGroupVO) {
         UserGroup userGroup = userGroupRepository.findOne(userGroupVO.getId());
         if (userGroup == null) {
             return notFound().build();
@@ -43,6 +52,18 @@ public class UserGroupController {
         userGroupRepository.save(userGroup);
 
         return ok(userGroupVO);
+    }
+
+    @RequestMapping(path = "/admin/groups/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        UserGroup userGroup = userGroupRepository.findOne(id);
+        if (userGroup == null) {
+            return notFound().build();
+        }
+
+        userGroupRepository.delete(userGroup);
+
+        return ok(new UserGroupVO(userGroup));
     }
 
 }
